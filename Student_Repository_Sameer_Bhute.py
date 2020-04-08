@@ -27,7 +27,7 @@ class Student:
     def pretty_student(self) -> Tuple[str,str,List[str]]:
         """Returns the tuples of the values for the fields of the pretty table"""
         # self.calculate_course()
-        return[self._cwid, self._name, sorted(self._coursel),sorted(self.calculate_required(self._summary_st)),sorted(self.calculate_electives(self._summary_st)),self.calculate_grade(self._summary_st)]
+        return[self._cwid, self._name,self._major,sorted(self._coursel),sorted(self.calculate_required(self._summary_st)),sorted(self.calculate_electives(self._summary_st)),self.calculate_grade(self._summary_st)]
     
     def calculate_grade(self,dict):
         """This functiton calculates the grades of the student and converts it into GPA"""
@@ -104,7 +104,7 @@ class Major:
         elif RE == 'E':
             self._elective_course.append(course)   
         else:
-            print("Your File Contains a bad Data")
+            print(f"Your File Contains a bad Data.This flag {RE} is not proper")
 
     def get_required(self) ->List[str]:
         """ Returns the list of required courses of the major"""
@@ -137,7 +137,7 @@ class Repository:
         except ValueError as ve:
             print("The specified field number does not match the files")
         except FileNotFoundError as fn:
-            raise FileNotFoundError
+            raise FileNotFoundError("Specified file or directory is unavialable")
     
     def _get_majors(self,directory: str) -> None:
         """Reads the major.txt file"""
@@ -177,6 +177,7 @@ class Repository:
         pt_student.field_names = [
             "CWID",
             "Name",
+            "Major",
             "Completed Course",
             "Remaining Required",
             "Remaining Electives",
