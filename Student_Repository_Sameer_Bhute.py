@@ -11,31 +11,32 @@ class Student:
         self._cwid: str = cwid
         self._name: str = name
         self._major: str = major
-        self.coursel:List[str] = list()
+        self._coursel:List[str] = list()
         self._remaining_required:List[str] = required
         self._remaining_eletives:List[str] = electives
+        self._grades: Dict[str,float] = {'A':4.0, 'A-':3.75, 'B+':3.25, 'B':3.0, 'B-':2.75, 'C+':2.25, 'C':2.0}
         self._summary_st: Dict[str,str] = dict()
 
     def student_course(self, course: str, grade: str):
         """Creates courses and grades dictionary"""
         self._summary_st[course] = grade
-        if grade in ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C']:
-            self.coursel.append(course)
+        if grade in self._grades.keys():
+            self._coursel.append(course)
              # self.calculate_course()
     
     def pretty_student(self) -> Tuple[str,str,List[str]]:
         """Returns the tuples of the values for the fields of the pretty table"""
         # self.calculate_course()
-        return[self._cwid, self._name, sorted(self.coursel),sorted(self.calculate_required(self._summary_st)),sorted(self.calculate_electives(self._summary_st)),self.calculate_grade(self._summary_st)]
+        return[self._cwid, self._name, sorted(self._coursel),sorted(self.calculate_required(self._summary_st)),sorted(self.calculate_electives(self._summary_st)),self.calculate_grade(self._summary_st)]
     
     def calculate_grade(self,dict):
         """This functiton calculates the grades of the student and converts it into GPA"""
         sum: int = 0
-        grades: Dict[str,float] = {'A':4.0, 'A-':3.75, 'B+':3.25, 'B':3.0, 'B-':2.75, 'C+':2.25, 'C':2.0}
+        # grades: Dict[str,float] = {'A':4.0, 'A-':3.75, 'B+':3.25, 'B':3.0, 'B-':2.75, 'C+':2.25, 'C':2.0}
         courses_grade :List= list()
         for key, value in dict.items():
-            if value in grades:
-                sum = sum + grades[value]
+            if value in self._grades:
+                sum = sum + self._grades[value]
                 courses_grade.append(value)
             else:
                 return 0.0
@@ -45,7 +46,7 @@ class Student:
         """This function calculates the list of required courses for the student in the major"""
         course_per_student = []
         for key, value in ls.items():
-            if value in ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C']:
+            if value in self._grades.keys():
                 course_per_student.append(key)
             else:
                 return(self._remaining_required)
@@ -56,7 +57,7 @@ class Student:
         """This function calculates the list of elective courses for the student in the major"""
         course_per_student = []
         for key, value in ls.items():
-            if value in ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C']:
+            if value in self._grades.keys():
                 course_per_student.append(key)
             else:
                 return(self._remaining_eletives)
@@ -115,7 +116,7 @@ class Major:
     
     def pretty_major(self) -> Tuple[str,str,str]:
         """Returns the filed for pretty table """
-        return [self._major,self._required_course,self._elective_course]
+        return [self._major,sorted(self._required_course),sorted(self._elective_course)]
 
 class Repository:
     """ Repository class which contins the info of student,major,instructors and grades"""
