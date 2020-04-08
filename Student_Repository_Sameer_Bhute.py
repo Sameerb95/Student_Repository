@@ -128,6 +128,7 @@ class Repository:
         self._Major: Dict[str,Major] = dict()
  
         try:
+            """Reading the files"""
             self._get_majors(os.path.join(directory,'major.txt'))
             self._get_students(os.path.join(directory,'students.txt'))
             self._get_instructor(os.path.join(directory,'instructors.txt'))
@@ -229,7 +230,7 @@ class Repository:
         print(pt_major)
 
 if __name__ == '__main__':
-    r = Repository('C:\\Users\\samee\\Desktop\\Second_Sem\\SSW_810\\HW10')
+    r = Repository('C:\\Users\\samee\\Desktop\\Second_Sem\\SSW_810\\HW10\\Student_Repository\\Student_Repository')
     # r.Student.pretty_print()
     r.pretty_print_major()
     r.pretty_print_st()
