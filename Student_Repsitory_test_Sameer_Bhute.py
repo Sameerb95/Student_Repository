@@ -35,7 +35,7 @@ class Test_HW10(unittest.TestCase):
         list2 = [['SFEN', ['SSW 540', 'SSW 555', 'SSW 564', 'SSW 567'], ['CS 501', 'CS 513', 'CS 545']], ['SYEN', ['SYS 612', 'SYS 671', 'SYS 800'], ['SSW 540', 'SSW 565', 'SSW 810']]]
         for major in stevens._Major.values():
             list1.append(major.pretty_major())
-        print(list1)
+        # print(list1)
         self.assertEqual(list1, list2)
     
     def test_file_not_found_error(self) -> None:
