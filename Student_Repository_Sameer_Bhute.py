@@ -21,41 +21,45 @@ class Student:
         """Creates courses and grades dictionary"""
         self._summary_st[course] = grade
         if grade in self._grades.keys():
-            self._coursel.append(course)
+            self._coursel.append(course)    
              # self.calculate_course()
+        else:
+            return self._coursel
     
     def pretty_student(self) -> Tuple[str,str,List[str]]:
         """Returns the tuples of the values for the fields of the pretty table"""
         # self.calculate_course()
         return[self._cwid, self._name,self._major,sorted(self._coursel),sorted(self.calculate_required(self._summary_st)),sorted(self.calculate_electives(self._summary_st)),self.calculate_grade(self._summary_st)]
     
-    def calculate_grade(self,dict):
+    def calculate_grade(self,dict:Dict[str,int]):
         """This functiton calculates the grades of the student and converts it into GPA"""
         sum: int = 0
         # grades: Dict[str,float] = {'A':4.0, 'A-':3.75, 'B+':3.25, 'B':3.0, 'B-':2.75, 'C+':2.25, 'C':2.0}
-        courses_grade :List= list()
+        courses_grade :List[int]= list()
         for key, value in dict.items():
+            if value == '':
+                continue
             if value in self._grades:
                 sum = sum + self._grades[value]
                 courses_grade.append(value)
             else:
                 return 0.0
-        return format(sum/len(courses_grade),'.1f')
+        return format(sum/len(courses_grade),'.2f')
     
-    def calculate_required(self,ls):
+    def calculate_required(self,ls: Dict[str,str]):
         """This function calculates the list of required courses for the student in the major"""
-        course_per_student = []
+        course_per_student: List[str] = []
         for key, value in ls.items():
             if value in self._grades.keys():
                 course_per_student.append(key)
             else:
-                return(self._remaining_required)
+                continue
 
         return list(set(self._remaining_required) - set(course_per_student))
     
-    def calculate_electives(self,ls):
+    def calculate_electives(self,ls: Dict[str,str]):
         """This function calculates the list of elective courses for the student in the major"""
-        course_per_student = []
+        course_per_student: List[str] = []
         for key, value in ls.items():
             if value in self._grades.keys():
                 course_per_student.append(key)
@@ -137,7 +141,7 @@ class Repository:
         except ValueError as ve:
             print("The specified field number does not match the files")
         except FileNotFoundError as fn:
-            raise FileNotFoundError("Specified file or directory is unavialable")
+            raise FileNotFoundError("Specified file or directory is unavialable ")
     
     def _get_majors(self,directory: str) -> None:
         """Reads the major.txt file"""
