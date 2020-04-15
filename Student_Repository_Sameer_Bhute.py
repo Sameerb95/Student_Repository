@@ -3,6 +3,7 @@ import os
 from collections import defaultdict
 from prettytable import PrettyTable
 from typing import DefaultDict,Dict,Tuple,Iterator,List
+import sqlite3
 
 class Student:
     """ Contains the info of the student and stores the information present in the file"""
@@ -122,6 +123,20 @@ class Major:
         """Returns the filed for pretty table """
         return [self._major,sorted(self._required_course),sorted(self._elective_course)]
 
+# class Grades:
+
+#     def __init__(self,student_name:str,st_cwid:int,course:str,grade:str,instructor_name:str):
+#         self._Student_Name: str = student_name
+#         self._st_cwid: int = st_cwid
+#         self._course: str = course
+#         self._grade: str = grade
+#         self._Instructor_Name: str = instructor_name
+    
+#     def pretty_grade(self):
+#         return [sorted(self._Student_Name),self._st_cwid,self._course,self._grade,self._Instructor_Name]    
+
+    
+
 class Repository:
     """ Repository class which contins the info of student,major,instructors and grades"""
 
@@ -130,10 +145,11 @@ class Repository:
         self._Student: Dict[str,Student] = dict()
         self._Instructor: Dict[str,Instructor] = dict()
         self._Major: Dict[str,Major] = dict()
+        self._Grades: Dict[str,Grades] = dict()
  
         try:
             """Reading the files"""
-            self._get_majors(os.path.join(directory,'major.txt'))
+            self._get_majors(os.path.join(directory,'majors.txt'))
             self._get_students(os.path.join(directory,'students.txt'))
             self._get_instructor(os.path.join(directory,'instructors.txt'))
             self._get_grades(os.path.join(directory,'grades.txt'))
@@ -152,28 +168,31 @@ class Repository:
         
     def _get_students(self,directory: str) -> None:
         """Reads student.txt file"""
-        for cwid,name,major in file_reader(directory,3,sep=';',header=True):
+        for cwid,name,major in file_reader(directory,3,sep='\t',header=True):
             self._Student[cwid] = Student(cwid,name,major,self._Major[major].get_required(),self._Major[major].get_electives())
     
     def _get_instructor(self,directory: str) -> None:
         """Reads instructor.txt file"""
-        for cwid,name,dept in file_reader(directory,3,sep='|',header=True):
+        for cwid,name,dept in file_reader(directory,3,sep='\t',header=True):
             self._Instructor[cwid] = Instructor(cwid,name,dept)
     
     def _get_grades(self,directory: str) -> None:
         """Reads grades.txt file"""
-        for st_cwid,course,grade,ins_cwid in file_reader(directory,4,sep='|',header=True):
+        i = 0 
+        for st_cwid,course,grade,ins_cwid in file_reader(directory,4,sep='\t',header=True):
             if st_cwid in self._Student:
                 self._Student[st_cwid].student_course(course,grade)
+                # self._Grades[i] = Grades(self._Student[st_cwid]._name,st_cwid,course,grade,self._Instructor[ins_cwid]._name)
+                # print(self._Grades)
             else:
                 print(f"Found grade for unknown student '{st_cwid}'")
             if ins_cwid in self._Instructor:
                 self._Instructor[ins_cwid].add_student(course)
             else:
                 print(f"Found grade for unknown instructor'{ins_cwid}'")
-    
-    
-
+            
+            i+=1
+        
     def pretty_print_st(self):
         """Prints the summary of the instructor and grades file by the field 'CWID','Name','Course' and 'No of student' """
 
@@ -182,7 +201,7 @@ class Repository:
             "CWID",
             "Name",
             "Major",
-            "Completed Course",
+            "Completed Courses",
             "Remaining Required",
             "Remaining Electives",
             "Grades"
@@ -233,12 +252,30 @@ class Repository:
         print('\n')
         print("Major Summary")
         print(pt_major)
+    
+    def student_grade_table_db(self,db_path):
+        pt_grades: PrettyTable = PrettyTable()
+        pt_grades.field_names = [
+            "Name",
+            "CWID",
+            "Course",
+            "Grade",
+            "Instructor"
+            ]
+        db: sqlite3.Connection = sqlite3.connect(db_path)
+        for row in db.execute("SELECT (s.Name) as 'Student',(s.CWID) as 'CWID',(g.Grade) as 'Earned_grade',(g.Course) as 'In_Course',(i.Name) as 'Thought_by' from students as s inner join grades as g on s.CWID = g.StudentCWID inner join instructors i on g.InstructorCWID = i.CWID"):
+                    pt_grades.add_row(row)
+        
+        print('\n')
+        print("Grades Summary")
+        print(pt_grades)
+
 
 if __name__ == '__main__':
-    r = Repository('C:\\Users\\samee\\Desktop\\Second_Sem\\SSW_810\\HW10\\Student_Repository\\Student_Repository')
-    # r.Student.pretty_print()
+    r = Repository('C:\\Users\\samee\\Desktop\\Second_Sem\\SSW_810\\HW11')
     r.pretty_print_major()
     r.pretty_print_st()
     r.pretty_print_ins()
+    r.student_grade_table_db("C:\\Users\\samee\\Desktop\\Second_Sem\\SSW_810\\HW11\\HW11_Tables")
 
  
