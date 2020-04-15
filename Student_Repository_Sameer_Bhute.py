@@ -264,10 +264,10 @@ class Repository:
 
 
 if __name__ == '__main__':
-    r = Repository('C:\\Users\\samee\\Desktop\\Second_Sem\\SSW_810\\HW11')
+    r = Repository("C:\\Users\\samee\\Desktop\\Second_Sem\\SSW_810\\HW11\\Student_Repository")
     r.pretty_print_major()
     r.pretty_print_st()
     r.pretty_print_ins()
-    r.student_grade_table_db("C:\\Users\\samee\\Desktop\\Second_Sem\\SSW_810\\HW11\\HW11_Tables")
+    r.student_grade_table_db("C:\\Users\\samee\\Desktop\\Second_Sem\\SSW_810\\HW11\\Student_Repository\\HW11_Tables")
 
  
