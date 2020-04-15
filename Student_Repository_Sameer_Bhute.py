@@ -23,19 +23,16 @@ class Student:
         self._summary_st[course] = grade
         if grade in self._grades.keys():
             self._coursel.append(course)    
-             # self.calculate_course()
         else:
             return self._coursel
     
     def pretty_student(self) -> Tuple[str,str,List[str]]:
         """Returns the tuples of the values for the fields of the pretty table"""
-        # self.calculate_course()
         return[self._cwid, self._name,self._major,sorted(self._coursel),sorted(self.calculate_required(self._summary_st)),sorted(self.calculate_electives(self._summary_st)),self.calculate_grade(self._summary_st)]
     
     def calculate_grade(self,dict:Dict[str,int]):
         """This functiton calculates the grades of the student and converts it into GPA"""
         sum: int = 0
-        # grades: Dict[str,float] = {'A':4.0, 'A-':3.75, 'B+':3.25, 'B':3.0, 'B-':2.75, 'C+':2.25, 'C':2.0}
         courses_grade :List[int]= list()
         for key, value in dict.items():
             if value == '':
@@ -78,9 +75,7 @@ class Instructor:
         self._cwid: str = cwid
         self._name: str = name
         self._dept: str = dept
-        # self.summary: DefaultDict = defaultdict()
         self._students: DefaultDict[str,int] = defaultdict(int)
-        # self.gradeslist_in:DefaultDict= defaultdict(str)
 
     def add_student(self, course:str) -> None:
         """Creates the dictionary of the students in the class of the instructor"""
@@ -162,8 +157,11 @@ class Repository:
     def _get_majors(self,directory: str) -> None:
         """Reads the major.txt file"""
         for  major,RE_courses,courses in file_reader(directory,3,sep='\t',header=True):
-            if major not in self._Major:
-                self._Major[major] = Major(major)
+            if major not in self._Student:
+                if major not in self._Major:
+                    self._Major[major] = Major(major)
+            else:
+                print(f"Found student for unknown major '{major}'")
             self._Major[major].add_major(courses,RE_courses)
         
     def _get_students(self,directory: str) -> None:
@@ -178,12 +176,9 @@ class Repository:
     
     def _get_grades(self,directory: str) -> None:
         """Reads grades.txt file"""
-        i = 0 
         for st_cwid,course,grade,ins_cwid in file_reader(directory,4,sep='\t',header=True):
             if st_cwid in self._Student:
                 self._Student[st_cwid].student_course(course,grade)
-                # self._Grades[i] = Grades(self._Student[st_cwid]._name,st_cwid,course,grade,self._Instructor[ins_cwid]._name)
-                # print(self._Grades)
             else:
                 print(f"Found grade for unknown student '{st_cwid}'")
             if ins_cwid in self._Instructor:
@@ -191,8 +186,6 @@ class Repository:
             else:
                 print(f"Found grade for unknown instructor'{ins_cwid}'")
             
-            i+=1
-        
     def pretty_print_st(self):
         """Prints the summary of the instructor and grades file by the field 'CWID','Name','Course' and 'No of student' """
 
@@ -207,7 +200,6 @@ class Repository:
             "Grades"
         ]
 
-        # print(self.summary)
         for student in self._Student.values():
             pt_student.add_row(student.pretty_student())
 
@@ -227,7 +219,6 @@ class Repository:
             "Students"
         ]
 
-        # print(self.summary)
         for instructor in self._Instructor.values():
             for row in instructor.pretty_instructor():
                 pt_instructor.add_row(row)
@@ -263,8 +254,9 @@ class Repository:
             "Instructor"
             ]
         db: sqlite3.Connection = sqlite3.connect(db_path)
-        for row in db.execute("SELECT (s.Name) as 'Student',(s.CWID) as 'CWID',(g.Grade) as 'Earned_grade',(g.Course) as 'In_Course',(i.Name) as 'Thought_by' from students as s inner join grades as g on s.CWID = g.StudentCWID inner join instructors i on g.InstructorCWID = i.CWID"):
-                    pt_grades.add_row(row)
+        for row in db.execute("SELECT (s.Name) as 'Student',(s.CWID) as 'CWID',(g.Grade) as 'Earned_grade',(g.Course) as 'In_Course',(i.Name) as 'Thought_by' from students as s inner join grades as g on s.CWID = g.StudentCWID inner join instructors i on g.InstructorCWID = i.CWID ORDER BY s.Name"):
+                    # print(row)
+                pt_grades.add_row(row)
         
         print('\n')
         print("Grades Summary")
